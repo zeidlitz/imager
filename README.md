@@ -52,7 +52,7 @@ Configuration settings are managed via environment variables, with the environme
 
 You can try this out by setting a `HTTP_PORT` environment variable to configure the network port that the server is listening on:
 
-```
+```bash
 $ export HTTP_PORT="9999"
 $ go run ./cmd/web
 ```
@@ -81,7 +81,7 @@ You can see an example of this in the `cmd/web/main.go` file where we initialize
 
 [HttpRouter](https://github.com/julienschmidt/httprouter) is used for routing. Routes are defined in the `routes()` method in the `cmd/web/routes.go` file. For example:
 
-```
+```go
 func (app *application) routes() http.Handler {
     mux := httprouter.New()
 
@@ -97,7 +97,7 @@ For more information about HttpRouter and example usage, please see the [officia
 
 Middleware is defined as methods on the `application` struct in the `cmd/web/middleware.go` file. Feel free to add your own. They take the pattern:
 
-```
+```go
 func (app *application) yourMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         // Your middleware logic...
@@ -108,7 +108,7 @@ func (app *application) yourMiddleware(next http.Handler) http.Handler {
 
 You can then use this middleware by wrapping the router before returning it from the `routes()` method, like so:
 
-```
+```go
 func (app *application) routes() http.Handler {
     mux := httprouter.New()
 
@@ -121,7 +121,7 @@ func (app *application) routes() http.Handler {
 
 It's possible to use middleware on specific routes only:
 
-```
+```go
 func (app *application) routes() http.Handler {
     mux := httprouter.New()
 
@@ -151,7 +151,7 @@ The HTML for web pages can be sent using the `response.Page()` function. For con
 
 For example, to render the HTML in a `assets/templates/pages/example.tmpl` file:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     data := app.newTemplateData()
     data["hello"] = "world"
@@ -165,7 +165,7 @@ func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
 
 Specific HTTP headers can optionally be sent with the response too:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     data := app.newTemplateData()
     data["hello"] = "world"
@@ -186,7 +186,7 @@ Note: All the files in the `assets/templates` directory are embedded into your a
 
 If you have data that you want to display or use on multiple web pages, you can adapt the `newTemplateData()` helper in the `helpers.go` file to include this by default. For example, if you wanted to include the current year value you could adapt it like this:
 
-```
+```go
 func (app *application) newTemplateData() map[string]any {
     data := map[string]any{
         "CurrentYear": time.Now().Year(),
@@ -228,7 +228,7 @@ The following custom template functions are already included by default:
 
 To add another custom template function, define the function in `internal/funcs/funcs.go` and add it to the `TemplateFuncs` map. For example:
 
-```
+```go
 var TemplateFuncs = template.FuncMap{
     ...
     "yourFunction": yourFunction,
@@ -253,7 +253,7 @@ The codebase includes a `request.DecodePostForm()` function for automatically de
 
 As an example, let's say you have a page with the following HTML form for creating a 'person' record and routing rule:
 
-```
+```go
 <form action="/person/create" method="POST">
     <div>
         <label>Your name:</label>
@@ -267,7 +267,7 @@ As an example, let's say you have a page with the following HTML form for creati
 </form>
 ```
 
-```
+```go
 func (app *application) routes() http.Handler {
     mux := flow.New()
 
@@ -279,7 +279,7 @@ func (app *application) routes() http.Handler {
 
 Then you can display and parse this form with a `createPerson` handler like this:
 
-```
+```go
 package main
 
 import (
@@ -329,7 +329,7 @@ The `internal/validator` package includes a simple (but powerful) `validator.Val
 
 Extending the example above:
 
-```
+```go
 package main
 
 import (
@@ -392,7 +392,7 @@ func (app *application) createPerson(w http.ResponseWriter, r *http.Request) {
 
 And you can display the error messages in your HTML form like this:
 
-```
+```html
 <form action="/person/create" method="POST">
     {{if .Form.Validator.HasErrors}}
         <p>Something was wrong. Please correct the errors below and try again.</p>
@@ -417,13 +417,13 @@ And you can display the error messages in your HTML form like this:
 
 In the example above we use the `CheckField()` method to carry out validation checks for specific fields. You can also use the `Check()` method to carry out a validation check that is _not related to a specific field_. For example:
 
-```
+```go
 input.Validator.Check(input.Password == input.ConfirmPassword, "Passwords do not match")
 ```
 
 The `validator.AddError()` and `validator.AddFieldError()` methods also let you add validation errors directly:
 
-```
+```go
 input.Validator.AddFieldError("Email", "This email address is already taken")
 input.Validator.AddError("Passwords do not match")
 ```
@@ -446,7 +446,7 @@ The `internal/validator/helpers.go` file also contains some helper functions to 
 
 For example, to use the `Between` check your code would look similar to this:
 
-```
+```go
 input.Validator.CheckField(validator.Between(input.Age, 18, 30), "Age", "Age must between 18 and 30")
 ```
 
@@ -456,7 +456,7 @@ Feel free to add your own helper functions to the `internal/validator/helpers.go
 
 JSON responses and a specific HTTP status code can be sent using the `response.JSON()` function. The `data` parameter can be any JSON-marshalable type.
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     data := map[string]string{"hello":  "world"}
 
@@ -469,7 +469,7 @@ func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
 
 Specific HTTP headers can optionally be sent with the response too:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     data := map[string]string{"hello":  "world"}
 
@@ -487,7 +487,7 @@ func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
 
 HTTP requests containing a JSON body can be decoded using the `request.DecodeJSON()` function. For example, to decode JSON into an `input` struct:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     var input struct {
         Name string `json:"Name"`
@@ -516,7 +516,7 @@ The `internal/validator` package includes a simple (but powerful) `validator.Val
 
 Extending the example above:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     var input struct {
         Name      string              `json:"Name"`
@@ -545,7 +545,7 @@ func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
 
 The `app.failedValidation()` helper will send a `422` status code along with any validation error messages. For the example above, the JSON response will look like this:
 
-```
+```go
 {
     "FieldErrors": {
         "Age": "Age must be 21 or over",
@@ -562,7 +562,7 @@ The codebase is also configured to use [jmoiron/sqlx](https://github.com/jmoiron
 
 The database is available to your handlers, middleware and helpers via the `application` struct. If you want, you can access the database and carry out queries directly. For example:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     ...
 
@@ -578,7 +578,7 @@ func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
 
 Generally though, it's recommended to isolate your database logic in the `internal/database` package and extend the `DB` type to include your own methods. For example, you could create a `internal/database/people.go` file containing code like:
 
-```
+```go
 type Person struct {
     ID    int    `db:"id"`
     Name  string `db:"name"`
@@ -599,7 +599,7 @@ func (db *DB) GetPerson(id int) (Person, error) {
 
 And then call this from your handlers:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     ...
 
@@ -619,7 +619,7 @@ Leveled logging is supported using the [slog](https://pkg.go.dev/log/slog) and [
 
 By default, a logger is initialized in the `main()` function. This logger writes all log messages above `Debug` level to `os.Stdout`.
 
-```
+```go
 logger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{Level: slog.LevelDebug}))
 ```
 
@@ -633,7 +633,7 @@ A `backgroundTask()` helper is included in the `cmd/web/helpers.go` file. You ca
 
 You can call it like so:
 
-```
+```go
 func (app *application) yourHandler(w http.ResponseWriter, r *http.Request) {
     ...
 
@@ -658,7 +658,7 @@ Using the `backgroundTask()` helper will automatically recover any panics in the
 
 The application version number is defined in a `Get()` function in the `internal/version/version.go` file. Feel free to change this as necessary.
 
-```
+```go
 package version
 
 func Get() string {
