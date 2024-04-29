@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
 )
+
 
 type PageData struct {
 	Paragraph string
@@ -74,9 +76,7 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func run() {
-	address := "localhost:8080"
-	fmt.Println("Listening on ", address)
+func Run(address string) {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/logo", logoHandler)
 	http.HandleFunc("/favicon", faviconHandler)
