@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>imager</title>
+    <title>{{ .Title }}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
@@ -14,13 +14,12 @@
   </head>
   <body>
     <h1>
-      <img src="/logo" alt="logo" class="center-image">
+      <img src="/logo" alt="logo" class="center-image" width="400" height="200">
     </h1>
     <ul style="list-style-type:none;text-align:center;font-size:120%;">
-      <li>frontend/component:v4</li>
-      <li>frontend/blender:v2</li>
-      <li>backend/routing:v7</li>
+      <li>{{ .Component }}</li>
     </ul>
     </p>
   </body>
 </html>
+

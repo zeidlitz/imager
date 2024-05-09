@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
+	"text/template"
 )
 
 
 type PageData struct {
-	Paragraph string
+	Title string
+	Component string
+  Version string
 }
 
 func getJsonResponseBytes(detail string, code int) ([]byte, error) {
@@ -66,13 +68,23 @@ func indexHandler(w http.ResponseWriter, req *http.Request) {
 		invalidMethod(w)
 	}
 
-	html, err := os.ReadFile("web/index.html")
+  data := PageData{
+    Title: "imager",
+    Component: "backend:v2",
+    Version: "1.0",
+  }
+  
+  tmpl, err := template.ParseFiles("web/index.html") 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.Write(html)
+  err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 }
 
